@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	img "example.com/image"
@@ -8,6 +9,10 @@ import (
 
 func main() {
 	fmt.Println("start")
-	img.ConvertImage()
+
+	path := flag.String("path", "", "path flag")
+	flag.Parse()
+
+	img.ConvertImage(*path)
 	fmt.Println("end")
 }

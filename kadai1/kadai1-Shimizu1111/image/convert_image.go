@@ -17,16 +17,23 @@ type Image struct {
 	Extension  string
 }
 
-type ImageExtensionTo string
+type ImageExtension string
 
 var (
-	imageExtensionToPng ImageExtensionTo = "png"
+	imageExtensionPng ImageExtension = "png"
+	imageExtensionJpg ImageExtension = "jpg"
 )
 
-func ConvertImage() {
-	inputImagePath, err := filepath.Abs("./image/image/input")
-	if err != nil {
-		panic(err)
+func ConvertImage(path string) {
+	var inputImagePath string
+	if path == "" {
+		i, err := filepath.Abs("./image/image/input")
+		if err != nil {
+			panic(err)
+		}
+		inputImagePath = i
+	} else {
+		inputImagePath = path
 	}
 	outputImagePath, err := filepath.Abs("./image/image/output")
 	if err != nil {
@@ -37,6 +44,7 @@ func ConvertImage() {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(inputImagepaths)
 
 	// 対象ディレクトリ内の画像を再帰的にconvert
 	for _, path := range inputImagepaths {
@@ -45,10 +53,15 @@ func ConvertImage() {
 			InputPath:  path,
 			Name:       filepath.Base(path),
 			OutputPath: outputImagePath,
-			Extension:  string(imageExtensionToPng),
+			Extension:  filepath.Ext(path),
 		}
-		if err := img.convert(); err != nil {
-			panic(err)
+		switch img.Extension {
+		case "." + string(imageExtensionJpg):
+			if err := img.convert(); err != nil {
+				panic(err)
+			}
+		default:
+			continue
 		}
 	}
 }
@@ -92,7 +105,7 @@ func (i *Image) convert() error {
 	// 対象の拡張子の画像を作成
 	fileName := filepath.Base(i.InputPath)
 	fileNameWithoutExt := strings.TrimSuffix(fileName, filepath.Ext(fileName))
-	outputImage, err := os.Create(i.OutputPath + "/" + fileNameWithoutExt + "." + i.Extension)
+	outputImage, err := os.Create(i.OutputPath + "/" + fileNameWithoutExt + "." + string(imageExtensionPng))
 	if err != nil {
 		return err
 	}
